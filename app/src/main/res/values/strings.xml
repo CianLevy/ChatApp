@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">TestApp</string>
+    <string name="edit_message">Enter a message</string>
+    <string name="button_send">Send</string>
+    <string name="current_port">1234</string>
+    <string name="port_label">Port</string>
+    <string name="username_label">Username</string>
+    <string name="hostmode_label">Host Mode</string>
+    <string name="ip_label">IP Address</string>
+</resources>
