@@ -7,4 +7,5 @@
     <string name="username_label">Username</string>
     <string name="hostmode_label">Host Mode</string>
     <string name="ip_label">IP Address</string>
+    <string name="button_connect">Connect</string>
 </resources>
