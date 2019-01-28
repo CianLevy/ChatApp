@@ -10,60 +10,61 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-public class Server extends Thread
-{
+public class Server extends Thread {
 
-    // Vector to store active clients
     static Vector<ClientHandler> ar = new Vector<>();
     private boolean exit;
-
-    // counter for clients
+    private int port;
+    public static String status;
+    public static boolean updateStatus;
     static int i = 0;
+
+    public Server(int port_){
+        updateStatus = false;
+        this.port = port_;
+    }
 
     @Override
     public void run()
     {
         exit = false;
 
-        // server is listening on port 1234
-        ServerSocket ss = null;
-        try {
-            ss = new ServerSocket(1234);
-            Socket s;
+        ServerSocket ss;
 
-            // running infinite loop for getting
-            // client request
-            while (!exit)
-            {
-                // Accept the incoming request
+        try {
+            ss = new ServerSocket(port);
+            Socket s;
+            status = "Server: Running on port: " + String.valueOf(port) + "\n";
+            updateStatus = true;
+
+            while (!exit) {
+
                 s = ss.accept();
 
-                System.out.println("New client request received : " + s);
+                status = "Server: New client request received from " + s.getInetAddress().getHostAddress() + ":" + s.getPort() + "\n";
+                updateStatus = true;
 
-                // obtain input and output streams
+
                 DataInputStream dis = new DataInputStream(s.getInputStream());
                 DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
                 System.out.println("Creating a new handler for this client...");
 
-                // Create a new handler object for handling this request.
+
                 ClientHandler mtch = new ClientHandler(s,"client " + i, dis, dos);
 
-                // Create a new Thread with this object.
+
                 Thread t = new Thread(mtch);
 
                 System.out.println("Adding this client to active client list");
 
 
-                // add this client to active clients list
                 ar.add(mtch);
 
-                // start the thread.
+
                 t.start();
 
-                // increment i for new client.
-                // i is used for naming only, and can be replaced
-                // by any naming scheme
+
                 i++;
 
             }
@@ -81,9 +82,8 @@ public class Server extends Thread
     }
 }
 
-class ClientHandler implements Runnable
-{
-    Scanner scn = new Scanner(System.in);
+class ClientHandler implements Runnable {
+
     private String name;
     final DataInputStream dis;
     final DataOutputStream dos;
@@ -91,9 +91,7 @@ class ClientHandler implements Runnable
     boolean isloggedin;
     private boolean exit;
 
-    // constructor
-    public ClientHandler(Socket s, String name,
-                         DataInputStream dis, DataOutputStream dos) {
+    public ClientHandler(Socket s, String name, DataInputStream dis, DataOutputStream dos) {
         this.dis = dis;
         this.dos = dos;
         this.name = name;
@@ -108,9 +106,7 @@ class ClientHandler implements Runnable
         String received;
         while (!exit)
         {
-            try
-            {
-                // receive the string
+            try {
                 received = dis.readUTF();
 
                 System.out.println(received);
@@ -121,22 +117,9 @@ class ClientHandler implements Runnable
                     break;
                 }
 
-                // break the string into message and recipient part
-                //StringTokenizer st = new StringTokenizer(received, "#");
-                //String MsgToSend = st.nextToken();
-                //String recipient = st.nextToken();
+                for (ClientHandler mc : Server.ar) {
+                    mc.dos.writeUTF(this.name+" : "+ received);
 
-                // search for the recipient in the connected devices list.
-                // ar is the vector storing client of active users
-                for (ClientHandler mc : Server.ar)
-                {
-                    // if the recipient is found, write on its
-                    // output stream
-                   // if (mc.name.equals(recipient) && mc.isloggedin==true)
-                   // {
-                        mc.dos.writeUTF(this.name+" : "+ received);
-                       // break;
-                   // }
                 }
             } catch (IOException e) {
 
@@ -144,9 +127,7 @@ class ClientHandler implements Runnable
             }
 
         }
-        try
-        {
-            // closing resources
+        try {
             this.dis.close();
             this.dos.close();
 
