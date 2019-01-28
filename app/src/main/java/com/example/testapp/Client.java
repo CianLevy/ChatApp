@@ -15,11 +15,15 @@ public class Client implements Runnable
     private int ServerPort = 1234;
     private Socket s;
     private String ipText;
+    static int bufferState;
+    static String buffer;
+    static boolean connectionStatus;
 
 
     public Client(String ip_, int port_){
         this.ipText = ip_;
-        ServerPort = port_;
+        this.ServerPort = port_;
+        connectionStatus = false;
 
     }
 
@@ -131,9 +135,66 @@ public class Client implements Runnable
         try {
             ip = InetAddress.getByName(ipText);
             this.s = new Socket(ip, ServerPort);
+            connectionStatus = true;
+            int scope = 2;
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        // obtaining input and out streams
+        final DataInputStream dis;
+        final DataOutputStream dos;
+
+        try {
+            dis = new DataInputStream(s.getInputStream());
+            dos = new DataOutputStream(s.getOutputStream());
+
+        // sendMessage thread
+        Thread sendMessage = new Thread(new Runnable()
+        {
+            @Override
+            public void run() {
+                while (true) {
+
+                    if (bufferState == 1){
+                        try {
+                            bufferState = 0;
+                            dos.writeUTF(buffer);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+
+
+            }
+        });
+
+        // readMessage thread
+        Thread readMessage = new Thread(new Runnable()
+        {
+            @Override
+            public void run() {
+
+                while (true) {
+                    try {
+                        // read the message sent to this client
+                        buffer = dis.readUTF();
+                        bufferState = 2;
+
+                    } catch (IOException e) {
+
+                        e.printStackTrace();
+                    }
+                }
+                }
+        });
+
+            sendMessage.start();
+            readMessage.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

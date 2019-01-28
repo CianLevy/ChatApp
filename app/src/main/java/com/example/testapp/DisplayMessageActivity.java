@@ -27,10 +27,10 @@ public class DisplayMessageActivity extends AppCompatActivity {
         Thread clientThread = new Thread(c);
         clientThread.start();
 
-        //String result = c.connect(Integer.valueOf(splitData[1]), splitData[0]) ? "Connected to server: " + connectionData : "Failed to connect to server";
-
+        String result = c.connectionStatus ? ("Connected to server: " + connectionData) : "Failed to connect to server";
+        System.out.println(result);
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("result","Connected to server");
+        returnIntent.putExtra("result",(result + "\n"));
         setResult(Activity.RESULT_OK,returnIntent);
         finish();
     }

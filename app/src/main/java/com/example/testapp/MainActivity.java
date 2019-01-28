@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     private static Server server;
+    Client c;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,19 +29,37 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        c = new Client("null", 0);
+
+        Thread readMessage = new Thread(new Runnable()
+        {
+            @Override
+            public void run() {
+
+                while (true) {
+                    if (c.bufferState == 2){
+                        TextView textView = findViewById(R.id.editText4);
+                        textView.append(c.buffer);
+                        c.bufferState = 0;
+                    }
+
+                }
+            }
+        });
+
+        readMessage.start();
+
         initialiseUI();
     }
 
     public void sendMessage(View view){
-        /*Intent intent = new Intent(this, DisplayMessageActivity.class);
-        EditText editText = (EditText) findViewById(R.id.editText);
+        EditText editText = (EditText) findViewById(R.id.multiAutoCompleteTextView);
         String message = editText.getText().toString();
-        intent.putExtra(EXTRA_MESSAGE, message);
 
 
-        startActivityForResult(intent, 1);
-        */
-
+        c.buffer = message;
+        c.bufferState = 1;
+        System.out.println(message);
     }
 
     public void connectToServer(View view){
@@ -93,8 +113,8 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
                 String result=data.getStringExtra("result");
-                TextView textView = findViewById(R.id.editText3);
-                textView.setText(result);
+                TextView textView = findViewById(R.id.editText4);
+                textView.append(result);
 
             }
             if (resultCode == Activity.RESULT_CANCELED) {

@@ -54,6 +54,7 @@ public class Server extends Thread
 
                 System.out.println("Adding this client to active client list");
 
+
                 // add this client to active clients list
                 ar.add(mtch);
 
@@ -121,9 +122,9 @@ class ClientHandler implements Runnable
                 }
 
                 // break the string into message and recipient part
-                StringTokenizer st = new StringTokenizer(received, "#");
-                String MsgToSend = st.nextToken();
-                String recipient = st.nextToken();
+                //StringTokenizer st = new StringTokenizer(received, "#");
+                //String MsgToSend = st.nextToken();
+                //String recipient = st.nextToken();
 
                 // search for the recipient in the connected devices list.
                 // ar is the vector storing client of active users
@@ -131,11 +132,11 @@ class ClientHandler implements Runnable
                 {
                     // if the recipient is found, write on its
                     // output stream
-                    if (mc.name.equals(recipient) && mc.isloggedin==true)
-                    {
-                        mc.dos.writeUTF(this.name+" : "+MsgToSend);
-                        break;
-                    }
+                   // if (mc.name.equals(recipient) && mc.isloggedin==true)
+                   // {
+                        mc.dos.writeUTF(this.name+" : "+ received);
+                       // break;
+                   // }
                 }
             } catch (IOException e) {
 
