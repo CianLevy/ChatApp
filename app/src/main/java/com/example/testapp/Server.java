@@ -73,12 +73,15 @@ public class Server extends Thread {
         }
     }
 
-    public void stopExecuting(){
+    public void stopExecuting() throws IOException {
         exit = true;
 
-        for (ClientHandler c : ar)
+        for (ClientHandler c : ar) {
             c.stopExecuting();
+        }
 
+        status = "Server: Server closed.\n";
+        updateStatus = true;
     }
 }
 
@@ -87,7 +90,7 @@ class ClientHandler implements Runnable {
     private String name;
     final DataInputStream dis;
     final DataOutputStream dos;
-    Socket s;
+    private Socket s;
     boolean isloggedin;
     private boolean exit;
 

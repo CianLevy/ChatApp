@@ -2,17 +2,21 @@ package com.example.testapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.net.wifi.WifiManager;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.Formatter;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import java.io.IOException;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -43,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
                 Looper.prepare();
 
                 while (true) {
-                    if (c.bufferState == 2){
+                    if (c.bufferState == 2 && c.buffer != null && !c.buffer.isEmpty()){
                         c.bufferState = 0;
 
                         chatBox.append(c.buffer);
@@ -97,6 +101,9 @@ public class MainActivity extends AppCompatActivity {
 
             i.putExtra("ADDRESS_DATA", connectionData);
             startActivityForResult(i, 1);
+            //c = new Client(ip, Integer.valueOf(port));
+            //Thread clientThread = new Thread(c);
+            //clientThread.start();
         }
         else{
             c.stopExecuting();
@@ -120,6 +127,10 @@ public class MainActivity extends AppCompatActivity {
         textView.setFocusable(false);
         //textView.setInputType(0);
 
+        textView = findViewById(R.id.multiAutoCompleteTextView);
+        textView.setMovementMethod(new ScrollingMovementMethod());
+        textView.setPaintFlags(textView.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+
         Switch hostSW = (Switch)findViewById(R.id.switch1);
         hostSW.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -133,7 +144,11 @@ public class MainActivity extends AppCompatActivity {
 
                 }
                 else {
-                    server.stopExecuting();
+                    try {
+                        server.stopExecuting();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
                 }
 
