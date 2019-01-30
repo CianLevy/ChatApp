@@ -39,62 +39,61 @@ public class Client implements Runnable
 
         final DataInputStream dis;
         final DataOutputStream dos;
+        if (connectionStatus) {
+            try {
+                dis = new DataInputStream(s.getInputStream());
+                dos = new DataOutputStream(s.getOutputStream());
 
-        try {
-            dis = new DataInputStream(s.getInputStream());
-            dos = new DataOutputStream(s.getOutputStream());
+                Thread sendMessage = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (!exit) {
 
-            Thread sendMessage = new Thread(new Runnable()
-            {
-                @Override
-                public void run() {
-                    while (!exit) {
+                            if (bufferState == 1) {
+                                try {
+                                    bufferState = 0;
+                                    dos.writeUTF(buffer);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
 
-                        if (bufferState == 1){
+                        }
+
+                    }
+                });
+
+                Thread readMessage = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        while (!exit) {
                             try {
-                                bufferState = 0;
-                                dos.writeUTF(buffer);
+                                buffer = dis.readUTF();
+                                bufferState = 2;
+
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
                         }
 
-                    }
-
-                }
-            });
-
-            Thread readMessage = new Thread(new Runnable()
-            {
-                @Override
-                public void run() {
-
-                    while (!exit) {
                         try {
-                            buffer = dis.readUTF();
-                            bufferState = 2;
-
+                            dis.close();
+                            dos.close();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+
                     }
+                });
 
-                    try {
-                        dis.close();
-                        dos.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-
-            sendMessage.start();
-            readMessage.start();
+                sendMessage.start();
+                readMessage.start();
 
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
     public void stopExecuting() {

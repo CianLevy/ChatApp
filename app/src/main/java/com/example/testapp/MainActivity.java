@@ -17,6 +17,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 
 public class MainActivity extends AppCompatActivity {

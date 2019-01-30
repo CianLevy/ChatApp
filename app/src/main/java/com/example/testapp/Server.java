@@ -41,7 +41,7 @@ public class Server extends Thread {
 
                 s = ss.accept();
 
-                status = "Server: New client request received from " + s.getInetAddress().getHostAddress() + ":" + s.getPort() + "\n";
+                status = "Server: New client request received from " + s.getInetAddress().getHostAddress() + ":" + s.getLocalPort() + "\n";
                 updateStatus = true;
 
 
