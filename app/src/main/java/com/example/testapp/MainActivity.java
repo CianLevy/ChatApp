@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.editText4);
         textView.setFocusable(false);
         //textView.setInputType(0);
+        
 
         textView = findViewById(R.id.multiAutoCompleteTextView);
         textView.setMovementMethod(new ScrollingMovementMethod());
